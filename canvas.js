@@ -173,7 +173,13 @@ export function clearGrid() {
  * @returns {boolean}
  */
 export function checkBounds(row, col) {
-    // TODO make sure row and col are within the grid
+    
+    if (row < 0 || row >= grid.length){
+        return false;
+    } else if (col < 0 || col >= grid[0].leength){
+        return false;
+    }
+
     return true;
 }
 
@@ -190,9 +196,13 @@ export function checkBounds(row, col) {
  * @param {(Particle) => boolean} swap 
  * @returns {boolean} If the particle was moved or not
  */
+  
 export function moveParticle(row, col, newRow, newCol, swap) {
-    // TODO move a particle from (row, col) to (newRow, newCol)
-    return true;
+    if (checkBounds(row, col)){
+        grid[newRow][newCol] = grid[row][col];
+        return true;
+    }
+    return false;
 }
 
 /**

@@ -45,11 +45,11 @@ export class Sand extends Particle {
     }
 
     swap(other) {
-        // TODO make sand fall under the water
+        
     }
 
     update(row, col) {
-        // TODO update sand
+        moveParticle(row, col, row+1, col, this.swap);
     }
 }
 
