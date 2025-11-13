@@ -205,7 +205,21 @@ export function redraw() {
     // Loop through all elements in the grid
     for (let row = 0; row < grid.length; row++) {
         for (let col = 0; col < grid[0].length; col++) {
-            // TODO draw particles to screen
+            
+            //get particle from the grid
+            const particle = grid[row][col];
+            
+            if (!particle){
+                continue;
+            }
+
+            //get particle color (for visual output)
+            ctx.fillstyle = particle.color;
+
+            //draws on the canvas
+            //eachSize scales from grid to pixels
+            ctx.fillRect(row * eachSize, col * eachSize, eachSize, eachSize);
+
         }
     }
 }
