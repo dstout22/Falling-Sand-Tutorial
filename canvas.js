@@ -200,6 +200,7 @@ export function checkBounds(row, col) {
 export function moveParticle(row, col, newRow, newCol, swap) {
     if (checkBounds(row, col,) && checkBounds(newRow, newCol)){
         grid[newRow][newCol] = grid[row][col];
+        grid[row][col] = null;
         return true;
     }
     return false;
