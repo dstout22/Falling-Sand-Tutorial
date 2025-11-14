@@ -229,7 +229,7 @@ export function redraw() {
 
             //draws on the canvas
             //eachSize scales from grid to pixels
-            ctx.fillRect(row * eachSize, col * eachSize, eachSize, eachSize);
+            ctx.fillRect(col * eachSize, row * eachSize, eachSize, eachSize);
 
         }
     }
