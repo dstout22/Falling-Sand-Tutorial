@@ -8,6 +8,8 @@ const speedSlider = document.getElementById("speedRange");
 const speedOutput = document.getElementById("speed");
 const brushSlider = document.getElementById("brushRange");
 const brushOutput = document.getElementById("brushSize");
+const tempSlider = document.getElementById("tempRange");
+const tempOutput = document.getElementById("temp");
 
 // When you change a slider value it updates its corresponding label
 speedOutput.innerHTML = speedSlider.value;
@@ -17,6 +19,10 @@ speedSlider.oninput = function() {
 brushOutput.innerHTML = brushSlider.value;
 brushSlider.oninput = function() {
     brushOutput.innerHTML = this.value;
+}
+tempOutput.innerHTML = tempSlider.value;
+tempSlider.oninput = function() {
+    tempOutput.innerHTML = this.value;
 }
 
 // Setup clear button
@@ -113,6 +119,10 @@ export function createParticle(mousePosition) {
         // Create a new particle and assign it to (row, col)
         if (!getParticle(row,col)){
             grid[row][col] = checkParticleType(value);
+        } else{
+            if (!checkParticleType(value)){
+                grid[row][col] = checkParticleType(value);
+            }
         }
 
         // Recursion to make brush a circle (size is radius)
@@ -250,4 +260,9 @@ export function redraw() {
 
         }
     }
+}
+
+//returns the temperature
+export function getTemp(){
+    return tempSlider.value;
 }

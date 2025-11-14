@@ -1,4 +1,4 @@
-import { checkBounds, moveParticle, getParticle, setParticle } from "./canvas.js";
+import { checkBounds, moveParticle, getParticle, setParticle, getTemp } from "./canvas.js";
 import { getRandomInt } from "./util.js";
 
 /**
@@ -85,6 +85,24 @@ export class Water extends Particle{
 
     update(row, col) {
 
+        let temp = getTemp();
+        if (temp == 0){
+            if (!getRandomInt(0,25)){
+                let newParticle = new Snow();
+                setParticle(row,col,newParticle);
+            }
+        } else{
+            if (!getRandomInt(0,100100-(1000 * temp))){
+                let newParticle = new Steam();
+                setParticle(row,col,newParticle);
+            }
+        }
+
+        if (!getRandomInt(0,1000) && !getParticle(row - 1, col)){
+            let particle = new Steam();
+            setParticle(row,col,particle);
+        }
+
         // Try to move down
         if (getRandomInt(0, 2) && !getParticle(row+1, col)) {
             moveParticle(row, col, row+1, col, super.swap);
@@ -128,6 +146,8 @@ export class Dirt extends Particle{
         // Fall due to gravity
         let newRow = row + 1;
 
+        let swapped = false;
+
         // If nothing below move down
         if (!moveParticle(row, col, newRow, col, this.swap)) {
             if (Math.random() * 2 >= 1){
@@ -137,7 +157,6 @@ export class Dirt extends Particle{
             }
         }
 
-        let swapped = false;
         let smothered = false;
 
         let newParticle = getParticle(row - 1, col);
@@ -160,7 +179,7 @@ export class Dirt extends Particle{
         for (let i = -1; i < 2; i++){
             let particle = getParticle(row + i, col - 1);
             if (particle){
-                if (particle.color === "green" && !smothered){
+                if (particle.color === "green" && !smothered && this.color !== "tan"){
                     this.color = "green";
                     swapped = true;
                     break;
@@ -168,7 +187,7 @@ export class Dirt extends Particle{
             }
             particle = getParticle(row + i, col + 1);
             if (particle){
-                if (particle.color === "green" && !smothered){
+                if (particle.color === "green" && !smothered && this.color !== "tan"){
                     this.color = "green";
                     swapped = true;
                     break;
@@ -176,10 +195,137 @@ export class Dirt extends Particle{
             }
         }
 
-        if (!swapped){
+        let temp = getTemp();
+        if (temp > 45){
+            if (!getRandomInt(0,(550-(temp*5))) && !getParticle(row - 1, col)){
+                this.color = "tan";
+                swapped = true;
+            }
+        } else{
+           if (!getRandomInt(0,200) && this.color === "tan"){
+                this.color = "saddlebrown";
+                swapped = false;
+            } 
+        }
+
+        if (!swapped && this.color !== "tan"){
             this.color = "saddlebrown";
         }
     }
+};
+
+export class Steam extends Particle{
+
+    constructor(){
+        super();
+        this.type = "Steam";
+        this.color = "gainsboro";
+    }
+
+    swap(other){
+        return other.type === "water"; 
+    }
+
+    update(row,col){
+
+    //changes trapped steam back into water
+    let particle = getParticle(row - 1, col);
+    if (particle){
+        if (particle.type === "Water"){
+            particle = new Water();
+            setParticle(row,col,particle);
+        }
+    }
+
+    let trapped = true
+    //changes an occassional cloud steam back into water (rain)
+    for (let i = -1; i < 2; i++){
+        let particle = getParticle(row + i, col - 1);
+        if (particle){
+            if (particle.type !== "Steam"){
+                trapped = false;
+                break;
+            }
+        } else{
+            trapped = false;
+        }
+        particle = getParticle(row + i, col + 1);
+        if (particle){
+            if (particle.type !== "Steam"){
+                trapped = false;
+                break;
+            }
+        } else{
+            trapped = false;
+        }
+    }
+
+    if (trapped && !getRandomInt(0,50 + temp) && !getParticle(row + 1, col)){
+        let temp = getTemp();
+        if (temp > 0){
+            let newParticle = new Water();
+            setParticle(row,col,newParticle);
+        } else{
+            let newParticle = new Snow();
+            setParticle(row,col,newParticle);
+        }
+    }
+
+    // Try to move down
+    if (getRandomInt(0, 2) && !getParticle(row-1, col)) {
+        moveParticle(row, col, row-1, col, super.swap);
+    } 
+        
+    // Move left or right
+    if (getRandomInt(0, 1) && !getParticle(row, col+1)) {
+        moveParticle(row, col, row, col+1, super.swap);
+    }
+    else if (!getParticle(row, col-1)) {
+        moveParticle(row, col, row, col-1, super.swap);
+    }
+
+    }
+};
+
+export class Snow extends Particle{
+
+    constructor(){
+        super();
+        this.color = "lightblue";
+        this.type = "Snow";
+    }
+
+    swap(other){
+
+    }
+
+    update(row,col){
+
+        let temp = getTemp();
+        if (temp > 0){
+            if (!getRandomInt(0,25)){
+                let newParticle = new Water();
+                setParticle(row,col,newParticle);
+            }
+        }
+
+        if (!getRandomInt(0,4)){
+        // Try to move down
+        if (getRandomInt(0, 2) && !getParticle(row+1, col)) {
+            moveParticle(row, col, row+1, col, super.swap);
+        } 
+        
+        // Move left or right
+        if (getRandomInt(0, 1) && !getParticle(row, col+1)) {
+            moveParticle(row, col, row, col+1, super.swap);
+        }
+        else if (!getParticle(row, col-1)) {
+            moveParticle(row, col, row, col-1, super.swap);
+        }
+        }
+
+    }
+
 };
 
 /**
@@ -203,5 +349,17 @@ export function checkParticleType(value) {
 
     if (value === "Dirt"){
         return new Dirt();
+    }
+
+    if (value === "Steam"){
+        return new Steam();
+    }
+
+    if (value === "Snow"){
+        return new Snow();
+    }
+
+    if (value === "Erase"){
+        return null;
     }
 }
