@@ -61,6 +61,7 @@ export function getRandomLocation() {
  * @returns {Particle}
  */
 export function getParticle(row, col) {
+    
     // Check to make sure coordinates are valid
     if (!checkBounds(row, col)) {
         return null;
@@ -111,7 +112,9 @@ export function createParticle(mousePosition) {
             return;
         }
         // Create a new particle and assign it to (row, col)
-        grid[row][col] = checkParticleType(value);
+        if (!getParticle(row,col)){
+            grid[row][col] = checkParticleType(value);
+        }
 
         // Recursion to make brush a circle (size is radius)
         if (size > 1) {
@@ -198,12 +201,27 @@ export function checkBounds(row, col) {
  */
   
 export function moveParticle(row, col, newRow, newCol, swap) {
-    if (checkBounds(row, col) && checkBounds(newRow, newCol) && !getParticle(newRow, newCol)){
-        grid[newRow][newCol] = grid[row][col];
-        grid[row][col] = null;
-        return true;
+    if (!checkBounds(row, col) || !checkBounds(newRow, newCol)){
+        return false;
     }
-    return false;
+
+    if (getParticle(newRow, newCol)) {
+        // If there is a particle but we can swap then flip the particles
+        if (swap && swap(getParticle(newRow, newCol))) {
+            const temp = grid[newRow][newCol];
+            grid[newRow][newCol] = grid[row][col];
+            grid[row][col] = temp;
+            return true;
+        }
+        // If we can't swap then don't move
+        else {
+            return false;
+        }
+    }
+
+    grid[newRow][newCol] = grid[row][col];
+    grid[row][col] = null;
+    return true;
 }
 
 /**
@@ -225,7 +243,7 @@ export function redraw() {
             }
 
             //get particle color (for visual output)
-            ctx.fillstyle = particle.color;
+            ctx.fillStyle = particle.color;
 
             //draws on the canvas
             //eachSize scales from grid to pixels

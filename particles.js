@@ -45,7 +45,7 @@ export class Sand extends Particle {
     }
 
     swap(other) {
-        
+        return other.type === "Water";
     }
 
     update(row, col) {
@@ -55,12 +55,57 @@ export class Sand extends Particle {
         // If nothing below move down
         if (!moveParticle(row, col, newRow, col, this.swap)) {
             if (Math.random() * 2 >= 1){
-                 moveParticle(row, col, newRow, col-2, this.swap);
+                if (Math.random() * 2 >= 1){
+                  moveParticle(row, col, newRow, col-1, this.swap);
+                } else{
+                  moveParticle(row, col, newRow, col-2, this.swap);  
+                }
             } else{
-                 moveParticle(row, col, newRow, col+2, this.swap);
+                 if (Math.random() * 2 >= 1){
+                  moveParticle(row, col, newRow, col+1, this.swap);
+                } else{
+                  moveParticle(row, col, newRow, col+2, this.swap);  
+                }
             }
         }
     }
+}
+
+export class Water extends Particle{
+
+    constructor(){
+        super();
+        this.color = "blue";
+        this.type = "Water";
+    }
+
+    swap(other){
+        
+    }
+
+    update(row, col) {
+
+        if (getRandomInt(0,3) && !getParticle(row+1, col-1)){
+            moveParticle(row, col, row+1, col-1, super.swap);
+        } else if(getRandomInt(0,3) && !getParticle(row+1, col+1)){
+            moveParticle(row, col, row+1, col+1, super.swap);
+        }
+
+
+        // Try to move down
+        if (getRandomInt(0, 2) && !getParticle(row+1, col)) {
+            moveParticle(row, col, row+1, col, super.swap);
+        } 
+        
+        // Move left or right
+        if (getRandomInt(0, 1) && !getParticle(row, col+1)) {
+            moveParticle(row, col, row, col+1, super.swap);
+        }
+        else if (!getParticle(row, col-1)) {
+            moveParticle(row, col, row, col-1, super.swap);
+        }
+    }
+
 }
 
 /**
@@ -73,5 +118,8 @@ export function checkParticleType(value) {
     if (value == "Sand") {
         return new Sand();
     } 
-    // TODO create new particles
+
+    if (value == "Water") {
+        return new Water();
+    }
 }
