@@ -3,7 +3,6 @@ import { getRandomInt } from "./util.js";
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext("2d");
-
 // Setup sliders
 const speedSlider = document.getElementById("speedRange");
 const speedOutput = document.getElementById("speed");
