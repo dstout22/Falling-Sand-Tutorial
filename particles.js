@@ -85,6 +85,35 @@ export class Water extends Particle{
 
     update(row, col) {
 
+        let nearbyParticle = getParticle(row - 1, col);
+        if (nearbyParticle){
+            if (nearbyParticle.type == "Lava"){
+                let thisParticle = new Steam();
+                setParticle(row,col,thisParticle);
+            }
+        }
+        nearbyParticle = getParticle(row + 1, col);
+        if (nearbyParticle){
+            if (nearbyParticle.type == "Lava"){
+                let thisParticle = new Steam();
+                setParticle(row,col,thisParticle);
+            }
+        }
+        nearbyParticle = getParticle(row, col + 1);
+        if (nearbyParticle){
+            if (nearbyParticle.type == "Lava"){
+                let thisParticle = new Steam();
+                setParticle(row,col,thisParticle);
+            }
+        }
+        nearbyParticle = getParticle(row, col - 1);
+        if (nearbyParticle){
+            if (nearbyParticle.type == "Lava"){
+                let thisParticle = new Steam();
+                setParticle(row,col,thisParticle);
+            }
+        }
+
         let temp = getTemp();
         if (temp == 0){
             if (!getRandomInt(0,25)){
@@ -328,6 +357,79 @@ export class Snow extends Particle{
 
 };
 
+export class Lava extends Particle{
+
+    constructor(){
+        super();
+        if (getRandomInt(0,1)){
+            this.color = "coral";
+        } else{
+            this.color = "red";
+        }
+        this.type = "Lava";
+    }
+
+    swap(other){
+        return other.type === "Lava" || other.type === "Steam";
+    }
+
+    update(row,col){
+
+        if (!getRandomInt(0,15)){
+            if (this.color === "red"){
+                this.color = "coral";
+            } else{
+                this.color = "red";
+            }
+        }
+
+        let temp = getTemp();
+        if (temp < 5){
+            if (!getRandomInt(0,20)){
+                let newParticle = new Obsidian();
+                setParticle(row,col,newParticle);
+            }
+        }
+
+        if (!getRandomInt(0,10000) && temp != 100){
+            let particle = new Obsidian();
+            setParticle(row,col,particle);
+        }
+
+        // Try to move down
+        if (getRandomInt(0, 2) && !getParticle(row+1, col)) {
+            moveParticle(row, col, row+1, col, super.swap);
+        } 
+        
+        // Move left or right
+        if (getRandomInt(0, 1) && !getParticle(row, col+1)) {
+            moveParticle(row, col, row, col+1, super.swap);
+        }
+        else if (!getParticle(row, col-1)) {
+            moveParticle(row, col, row, col-1, super.swap);
+        }
+    }
+
+};
+
+export class Obsidian extends Stone{
+    
+    constructor(){
+        super();
+        this.color = "black";
+        this.type = "Obsidian";
+    }
+
+    update(row,col){
+        let temp = getTemp();
+        if (temp == 100){
+            let newParticle = new Lava();
+            setParticle(row,col,newParticle);
+        }
+    }
+
+};
+
 /**
  * Create particle based on dropdown name
  * 
@@ -361,5 +463,13 @@ export function checkParticleType(value) {
 
     if (value === "Erase"){
         return null;
+    }
+
+    if (value === "Lava"){
+        return new Lava();
+    }
+
+    if (value === "Obsidian"){
+        return new Obsidian();
     }
 }
